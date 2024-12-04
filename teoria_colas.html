@@ -54,7 +54,29 @@
         <section id="modelo-multiples-servidores">
             <h3>Modelo de línea de espera con múltiples servidores y llegadas Poisson y tiempos de servicio exponenciales</h3>
             <p>Este modelo, conocido como <strong>M/M/c</strong>, generaliza el modelo M/M/1 al incluir múltiples servidores. Se utiliza para analizar sistemas como centros de llamadas o filas de cajas en supermercados.</p>
-        </section>
+        
+            <h4>Calculadora del Modelo M/M/c</h4>
+            <form id="mmc-form">
+                <label for="lambda-c">Tasa de llegada (\(\lambda\)):</label>
+                <input type="number" id="lambda-c" step="any" required>
+                <br>
+                <label for="mu-c">Tasa de servicio (\(\mu\)):</label>
+                <input type="number" id="mu-c" step="any" required>
+                <br>
+                <label for="c">Número de servidores (\(c\)):</label>
+                <input type="number" id="c" step="1" required>
+                <br>
+                <button type="button" onclick="calcularMMC()">Calcular</button>
+            </form>
+        
+            <div id="resultado-mmc" style="margin-top: 20px; display: none;">
+                <h4>Resultados:</h4>
+                <p><strong>Factor de utilización (\(\rho\)):</strong> <span id="rho-c"></span></p>
+                <p><strong>Probabilidad de que todos los servidores estén ocupados (\(P_0\)):</strong> <span id="p0"></span></p>
+                <p><strong>Número promedio en el sistema (\(L\)):</strong> <span id="l-c"></span></p>
+                <p><strong>Tiempo promedio en el sistema (\(W\)):</strong> <span id="w-c"></span></p>
+            </div>
+        </section>        
 
         <section id="modelo-fuentes-finitas">
             <h3>Modelos de línea de espera con fuentes finitas</h3>
@@ -98,6 +120,55 @@
             document.getElementById("w").textContent = w.toFixed(2);
 
             document.getElementById("resultado-mm1").style.display = "block";
+        }
+
+        function calcularMMC() {
+        // Obtener valores del formulario
+        const lambda = parseFloat(document.getElementById("lambda-c").value);
+        const mu = parseFloat(document.getElementById("mu-c").value);
+        const c = parseInt(document.getElementById("c").value);
+
+        // Validar entrada
+        if (isNaN(lambda) || isNaN(mu) || isNaN(c) || lambda <= 0 || mu <= 0 || c <= 0) {
+            alert("Por favor, ingresa valores válidos para λ, μ y c.");
+            return;
+        }
+
+        const rho = lambda / (c * mu);
+        if (rho >= 1) {
+            alert("El sistema no es estable. Asegúrate de que la tasa de llegada sea menor que la capacidad de servicio total.");
+            return;
+        }
+
+        // Calcular P0 usando la fórmula de Erlang-C
+        let sum = 0;
+        for (let n = 0; n < c; n++) {
+            sum += Math.pow(lambda / mu, n) / factorial(n);
+        }
+        const p0 = 1 / (sum + (Math.pow(lambda / mu, c) / (factorial(c) * (1 - rho))));
+
+        // Calcular L y W
+        const lq = (Math.pow(lambda / mu, c) * rho * p0) / (factorial(c) * Math.pow(1 - rho, 2));
+        const l = lq + (lambda / mu);
+        const w = l / lambda;
+
+        // Mostrar resultados
+        document.getElementById("rho-c").textContent = rho.toFixed(2);
+        document.getElementById("p0").textContent = p0.toFixed(4);
+        document.getElementById("l-c").textContent = l.toFixed(2);
+        document.getElementById("w-c").textContent = w.toFixed(2);
+
+        document.getElementById("resultado-mmc").style.display = "block";
+        }
+
+        // Función para calcular el factorial
+        function factorial(n) {
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
         }
     </script>
 </body>

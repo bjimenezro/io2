@@ -92,3 +92,37 @@ footer {
     padding: 10px 0;
     margin-top: 20px;
 }
+
+form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+form input {
+    padding: 5px;
+    margin-top: 5px;
+    width: 200px;
+}
+
+form button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #005bb5;
+}
+
+#resultado-mmc {
+    background: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 20px;
+}

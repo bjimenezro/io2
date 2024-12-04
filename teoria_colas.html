@@ -75,10 +75,13 @@
             <div id="resultado-mmc" style="margin-top: 20px; display: none;">
                 <h4>Resultados:</h4>
                 <p><strong>Factor de utilización (\(\rho\)):</strong> <span id="rho-c"></span></p>
-                <p><strong>Probabilidad de que todos los servidores estén ocupados (\(P_0\)):</strong> <span id="p0"></span></p>
+                <p><strong>Probabilidad de que todos los servidores estén desocupados (\(P_0\)):</strong> <span id="p0"></span></p>
+                <p><strong>Probabilidad de que todos los servidores estén ocupados (\(P(c)\)):</strong> <span id="pc"></span></p>
+                <p><strong>Número promedio en la cola (\(L_q\)):</strong> <span id="lq"></span></p>
                 <p><strong>Número promedio en el sistema (\(L\)):</strong> <span id="l-c"></span></p>
+                <p><strong>Tiempo promedio en la cola (\(W_q\)):</strong> <span id="wq"></span></p>
                 <p><strong>Tiempo promedio en el sistema (\(W\)):</strong> <span id="w-c"></span></p>
-            </div>
+            </div>            
         </section>        
 
         <section id="modelos-fuentes-finitas">
@@ -176,42 +179,57 @@
         }
 
         function calcularMMC() {
-        // Obtener valores del formulario
-        const lambda = parseFloat(document.getElementById("lambda-c").value);
-        const mu = parseFloat(document.getElementById("mu-c").value);
-        const c = parseInt(document.getElementById("c").value);
+            // Obtener valores del formulario
+            const lambda = parseFloat(document.getElementById("lambda-c").value);
+            const mu = parseFloat(document.getElementById("mu-c").value);
+            const c = parseInt(document.getElementById("c").value);
 
-        // Validar entrada
-        if (isNaN(lambda) || isNaN(mu) || isNaN(c) || lambda <= 0 || mu <= 0 || c <= 0) {
-            alert("Por favor, ingresa valores válidos para λ, μ y c.");
-            return;
-        }
+            // Validar entrada
+            if (isNaN(lambda) || isNaN(mu) || isNaN(c) || lambda <= 0 || mu <= 0 || c <= 0) {
+                alert("Por favor, ingresa valores válidos para λ, μ y c.");
+                return;
+            }
 
-        const rho = lambda / (c * mu);
-        if (rho >= 1) {
-            alert("El sistema no es estable. Asegúrate de que la tasa de llegada sea menor que la capacidad de servicio total.");
-            return;
-        }
+            const rho = lambda / (c * mu);
+            if (rho >= 1) {
+                alert("El sistema no es estable. Asegúrate de que la tasa de llegada sea menor que la capacidad de servicio total.");
+                return;
+            }
 
-        // Calcular P0 usando la fórmula de Erlang-C
-        let sum = 0;
-        for (let n = 0; n < c; n++) {
-            sum += Math.pow(lambda / mu, n) / factorial(n);
-        }
-        const p0 = 1 / (sum + (Math.pow(lambda / mu, c) / (factorial(c) * (1 - rho))));
+            // Calcular \( P_0 \) usando la fórmula de Erlang-C
+            let sum = 0;
+            for (let n = 0; n < c; n++) {
+                sum += Math.pow(lambda / mu, n) / factorial(n);
+            }
+            const p0 = 1 / (sum + (Math.pow(lambda / mu, c) / (factorial(c) * (1 - rho))));
 
-        // Calcular L y W
-        const lq = (Math.pow(lambda / mu, c) * rho * p0) / (factorial(c) * Math.pow(1 - rho, 2));
-        const l = lq + (lambda / mu);
-        const w = l / lambda;
+            // Probabilidad de que todos los servidores estén ocupados (\( P(c) \))
+            const pc = (Math.pow(lambda / mu, c) / factorial(c)) * p0;
 
-        // Mostrar resultados
-        document.getElementById("rho-c").textContent = rho.toFixed(2);
-        document.getElementById("p0").textContent = p0.toFixed(4);
-        document.getElementById("l-c").textContent = l.toFixed(2);
-        document.getElementById("w-c").textContent = w.toFixed(2);
+            // Calcular \( L_q \) (Número promedio en la cola)
+            const lq = (Math.pow(lambda / mu, c) * rho * p0) / (factorial(c) * Math.pow(1 - rho, 2));
 
-        document.getElementById("resultado-mmc").style.display = "block";
+            // Calcular \( L \) (Número promedio en el sistema)
+            const l = lq + (lambda / mu);
+
+            // Calcular \( W_q \) (Tiempo promedio en la cola)
+            const wq = lq / lambda;
+
+            // Calcular \( W \) (Tiempo promedio en el sistema)
+            const w = l / lambda;
+
+            // Mostrar resultados
+            document.getElementById("rho-c").textContent = rho.toFixed(2);
+            document.getElementById("p0").textContent = p0.toFixed(4);
+            document.getElementById("l-c").textContent = l.toFixed(2);
+            document.getElementById("w-c").textContent = w.toFixed(2);
+
+            // Mostrar \( P(c) \), \( L_q \), \( W_q \)
+            document.getElementById("pc").textContent = pc.toFixed(4);
+            document.getElementById("lq").textContent = lq.toFixed(2);
+            document.getElementById("wq").textContent = wq.toFixed(2);
+
+            document.getElementById("resultado-mmc").style.display = "block";
         }
 
         // Función para calcular el factorial
@@ -223,6 +241,7 @@
             }
             return result;
         }
+
 
             function calcularMM1K() {
         // Obtener valores del formulario

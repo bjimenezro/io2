@@ -134,3 +134,21 @@ form button:hover {
     border-radius: 5px;
     margin-top: 20px;
 }
+
+#matriz-container {
+    margin-top: 15px;
+}
+
+#matriz input {
+    text-align: center;
+    padding: 5px;
+}
+
+#resultado-asignacion ul {
+    list-style: none;
+    padding: 0;
+}
+
+#resultado-asignacion ul li {
+    margin-bottom: 5px;
+}

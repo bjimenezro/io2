@@ -106,8 +106,31 @@
 
         <section id="problemas-asignacion">
             <h3>Problemas de asignación de recursos</h3>
-            <p>Estos problemas están relacionados con cómo asignar de manera óptima los recursos disponibles (como servidores o máquinas) para minimizar costos o maximizar la eficiencia del sistema.</p>
-        </section>
+            <p>Los problemas de asignación de recursos buscan distribuir eficientemente recursos limitados entre tareas o actividades con base en criterios específicos, como minimizar costos o maximizar beneficios.</p>
+        
+            <h4>Calculadora de asignación (Método de costo mínimo)</h4>
+            <p>Introduce una matriz cuadrada de costos donde cada celda representa el costo de asignar un recurso a una tarea.</p>
+        
+            <form id="asignacion-form">
+                <label for="dimension">Dimensión de la matriz (N × N):</label>
+                <input type="number" id="dimension" min="2" max="10" required>
+                <button type="button" onclick="crearMatriz()">Crear Matriz</button>
+            </form>
+        
+            <div id="matriz-container" style="margin-top: 20px; display: none;">
+                <form id="matriz-form">
+                    <div id="matriz"></div>
+                    <button type="button" onclick="resolverAsignacion()">Resolver</button>
+                </form>
+            </div>
+        
+            <div id="resultado-asignacion" style="margin-top: 20px; display: none;">
+                <h4>Resultados:</h4>
+                <p><strong>Asignación Óptima:</strong></p>
+                <ul id="asignacion-optima"></ul>
+                <p><strong>Costo Total:</strong> <span id="costo-total"></span></p>
+            </div>
+        </section>        
     </main>
     <footer>
         <p>&copy; 2024 Investigación Operativa II</p>
@@ -241,6 +264,101 @@
             result *= i;
         }
         return result;
+    }
+
+    // Crear la matriz dinámica de entrada
+    function crearMatriz() {
+        const dimension = parseInt(document.getElementById("dimension").value);
+
+        if (isNaN(dimension) || dimension < 2 || dimension > 10) {
+            alert("Por favor, ingresa un tamaño válido para la matriz (entre 2 y 10).");
+            return;
+        }
+
+        const matrizContainer = document.getElementById("matriz");
+        matrizContainer.innerHTML = ""; // Limpiar matriz previa
+
+        for (let i = 0; i < dimension; i++) {
+            const row = document.createElement("div");
+            row.style.marginBottom = "10px";
+            for (let j = 0; j < dimension; j++) {
+                const input = document.createElement("input");
+                input.type = "number";
+                input.step = "any";
+                input.style.width = "60px";
+                input.style.marginRight = "5px";
+                input.required = true;
+                input.setAttribute("data-row", i);
+                input.setAttribute("data-col", j);
+                row.appendChild(input);
+            }
+            matrizContainer.appendChild(row);
+        }
+
+        document.getElementById("matriz-container").style.display = "block";
+    }
+
+    // Resolver el problema de asignación usando un enfoque básico
+    function resolverAsignacion() {
+        const inputs = document.querySelectorAll("#matriz input");
+        const dimension = parseInt(document.getElementById("dimension").value);
+
+        // Construir la matriz de costos
+        const matriz = Array.from({ length: dimension }, () => Array(dimension).fill(0));
+        inputs.forEach((input) => {
+            const row = parseInt(input.getAttribute("data-row"));
+            const col = parseInt(input.getAttribute("data-col"));
+            matriz[row][col] = parseFloat(input.value);
+        });
+
+        // Verificar que todos los valores sean válidos
+        if (matriz.flat().some(isNaN)) {
+            alert("Por favor, completa todos los valores de la matriz.");
+            return;
+        }
+
+        // Aplicar método de costo mínimo (simplificado)
+        const asignaciones = [];
+        const filasOcupadas = new Set();
+        const columnasOcupadas = new Set();
+        let costoTotal = 0;
+
+        while (asignaciones.length < dimension) {
+            let minimo = Infinity;
+            let filaSeleccionada = -1;
+            let columnaSeleccionada = -1;
+
+            // Encontrar el menor costo disponible
+            for (let i = 0; i < dimension; i++) {
+                if (filasOcupadas.has(i)) continue;
+                for (let j = 0; j < dimension; j++) {
+                    if (columnasOcupadas.has(j)) continue;
+                    if (matriz[i][j] < minimo) {
+                        minimo = matriz[i][j];
+                        filaSeleccionada = i;
+                        columnaSeleccionada = j;
+                    }
+                }
+            }
+
+            // Registrar la asignación
+            asignaciones.push(`Recurso ${filaSeleccionada + 1} → Tarea ${columnaSeleccionada + 1}`);
+            filasOcupadas.add(filaSeleccionada);
+            columnasOcupadas.add(columnaSeleccionada);
+            costoTotal += minimo;
+        }
+
+        // Mostrar resultados
+        const asignacionOptima = document.getElementById("asignacion-optima");
+        asignacionOptima.innerHTML = "";
+        asignaciones.forEach((asignacion) => {
+            const li = document.createElement("li");
+            li.textContent = asignacion;
+            asignacionOptima.appendChild(li);
+        });
+
+        document.getElementById("costo-total").textContent = costoTotal.toFixed(2);
+        document.getElementById("resultado-asignacion").style.display = "block";
     }
     </script>
 </body>

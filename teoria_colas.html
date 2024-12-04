@@ -45,9 +45,12 @@
 
             <div id="resultado-mm1" style="margin-top: 20px; display: none;">
                 <h4>Resultados:</h4>
-                <p><strong>Factor de utilización (\(\rho\)):</strong> <span id="rho"></span></p>
-                <p><strong>Número promedio en el sistema (\(L\)):</strong> <span id="l"></span></p>
-                <p><strong>Tiempo promedio en el sistema (\(W\)):</strong> <span id="w"></span></p>
+                <p><strong>Factor de utilización (rho):</strong> <span id="rho"></span></p>
+                <p><strong>Número promedio en el sistema (L):</strong> <span id="l"></span></p>
+                <p><strong>Tiempo promedio en el sistema (W):</strong> <span id="w"></span></p>
+                <p><strong>Probabilidad de que el sistema esté vacío (P₀):</strong> <span id="p0"></span></p>
+                <p><strong>Número esperado de clientes en la cola (Lq):</strong> <span id="lq"></span></p>
+                <p><strong>Tiempo esperado en la cola (Wq):</strong> <span id="wq"></span></p>
             </div>
         </section>
 
@@ -154,14 +157,20 @@
             }
 
             // Calcular métricas
-            const rho = lambda / mu;
-            const l = rho / (1 - rho);
-            const w = 1 / (mu - lambda);
+            const rho = lambda / mu; // Utilización
+            const l = rho / (1 - rho); // Número esperado de clientes en el sistema
+            const w = 1 / (mu - lambda); // Tiempo esperado en el sistema
+            const p0 = 1 - rho; // Probabilidad de que el sistema esté vacío
+            const lq = (rho ** 2) / (1 - rho); // Número esperado de clientes en la cola
+            const wq = rho / (mu - lambda); // Tiempo esperado en la cola
 
             // Mostrar resultados
             document.getElementById("rho").textContent = rho.toFixed(2);
             document.getElementById("l").textContent = l.toFixed(2);
             document.getElementById("w").textContent = w.toFixed(2);
+            document.getElementById("p0").textContent = p0.toFixed(2);
+            document.getElementById("lq").textContent = lq.toFixed(2);
+            document.getElementById("wq").textContent = wq.toFixed(2);
 
             document.getElementById("resultado-mm1").style.display = "block";
         }

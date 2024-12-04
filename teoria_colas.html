@@ -30,7 +30,25 @@
 
         <section id="modelo-un-servidor">
             <h3>Modelo de línea de espera con un servidor y llegadas Poisson y tiempos de servicio exponenciales</h3>
-            <p>Este modelo describe una situación donde hay una sola estación de servicio y las llegadas de los clientes se distribuyen de forma Poisson, mientras que los tiempos de servicio tienen una distribución exponencial. Es comúnmente conocido como el modelo <strong>M/M/1</strong>.</p>
+            <p>Este modelo describe una situación donde hay una sola estación de servicio y las llegadas de los clientes se distribuyen de forma Poisson, mientras que los tiempos de servicio tienen una distribución exponencial. Es conocido como el modelo <strong>M/M/1</strong>.</p>
+
+            <h4>Calculadora del Modelo M/M/1</h4>
+            <form id="mm1-form">
+                <label for="lambda">Tasa de llegada (\(\lambda\)):</label>
+                <input type="number" id="lambda" step="any" required>
+                <br>
+                <label for="mu">Tasa de servicio (\(\mu\)):</label>
+                <input type="number" id="mu" step="any" required>
+                <br>
+                <button type="button" onclick="calcularMM1()">Calcular</button>
+            </form>
+
+            <div id="resultado-mm1" style="margin-top: 20px; display: none;">
+                <h4>Resultados:</h4>
+                <p><strong>Factor de utilización (\(\rho\)):</strong> <span id="rho"></span></p>
+                <p><strong>Número promedio en el sistema (\(L\)):</strong> <span id="l"></span></p>
+                <p><strong>Tiempo promedio en el sistema (\(W\)):</strong> <span id="w"></span></p>
+            </div>
         </section>
 
         <section id="modelo-multiples-servidores">
@@ -51,5 +69,36 @@
     <footer>
         <p>&copy; 2024 Investigación Operativa II</p>
     </footer>
+
+    <script>
+        function calcularMM1() {
+            // Obtener valores del formulario
+            const lambda = parseFloat(document.getElementById("lambda").value);
+            const mu = parseFloat(document.getElementById("mu").value);
+
+            // Validar entrada
+            if (isNaN(lambda) || isNaN(mu) || lambda <= 0 || mu <= 0) {
+                alert("Por favor, ingresa valores válidos para λ y μ.");
+                return;
+            }
+
+            if (lambda >= mu) {
+                alert("El sistema no es estable. La tasa de llegada (λ) debe ser menor que la tasa de servicio (μ).");
+                return;
+            }
+
+            // Calcular métricas
+            const rho = lambda / mu;
+            const l = rho / (1 - rho);
+            const w = 1 / (mu - lambda);
+
+            // Mostrar resultados
+            document.getElementById("rho").textContent = rho.toFixed(2);
+            document.getElementById("l").textContent = l.toFixed(2);
+            document.getElementById("w").textContent = w.toFixed(2);
+
+            document.getElementById("resultado-mm1").style.display = "block";
+        }
+    </script>
 </body>
 </html>

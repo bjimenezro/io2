@@ -75,11 +75,11 @@
             <div id="resultado-mmc" style="margin-top: 20px; display: none;">
                 <h4>Resultados:</h4>
                 <p><strong>Factor de utilización (\(\rho\)):</strong> <span id="rho-c"></span></p>
-                <p><strong>Probabilidad de que todos los servidores estén desocupados (\(P_0\)):</strong> <span id="p0"></span></p>
+                <p><strong>Probabilidad de que todos los servidores estén desocupados (\(P_0\)):</strong> <span id="p-0"></span></p>
                 <p><strong>Probabilidad de que todos los servidores estén ocupados (\(P(c)\)):</strong> <span id="pc"></span></p>
-                <p><strong>Número promedio en la cola (\(L_q\)):</strong> <span id="lq"></span></p>
+                <p><strong>Número promedio en la cola (\(L_q\)):</strong> <span id="l-q"></span></p>
                 <p><strong>Número promedio en el sistema (\(L\)):</strong> <span id="l-c"></span></p>
-                <p><strong>Tiempo promedio en la cola (\(W_q\)):</strong> <span id="wq"></span></p>
+                <p><strong>Tiempo promedio en la cola (\(W_q\)):</strong> <span id="w-q"></span></p>
                 <p><strong>Tiempo promedio en el sistema (\(W\)):</strong> <span id="w-c"></span></p>
             </div>            
         </section>        
@@ -220,14 +220,14 @@
 
             // Mostrar resultados
             document.getElementById("rho-c").textContent = rho.toFixed(2);
-            document.getElementById("p0").textContent = p0.toFixed(4);
+            document.getElementById("p-0").textContent = p0.toFixed(4);
             document.getElementById("l-c").textContent = l.toFixed(2);
             document.getElementById("w-c").textContent = w.toFixed(2);
 
             // Mostrar \( P(c) \), \( L_q \), \( W_q \)
             document.getElementById("pc").textContent = pc.toFixed(4);
-            document.getElementById("lq").textContent = lq.toFixed(2);
-            document.getElementById("wq").textContent = wq.toFixed(2);
+            document.getElementById("l-q").textContent = lq.toFixed(2);
+            document.getElementById("w-q").textContent = wq.toFixed(2);
 
             document.getElementById("resultado-mmc").style.display = "block";
         }

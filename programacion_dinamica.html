@@ -19,11 +19,96 @@
         </nav>
     </header>
     <main>
-        <h2>Introducción</h2>
-        <p>Contenido sobre Programación Dinámica...</p>
+        <h2>Subtemas de Programación Dinámica</h2>
+        <p>Explora los diferentes tipos de Programación Dinámica:</p>
+        <ul>
+            <li><a href="#distribucion_cientificos">Distribución de científicos entre grupos de investigación</a></li>
+            <li><a href="#modelo-mg1">Modelo de línea de espera con un servidor y tiempos de servicio arbitrarios</a></li>
+            <li><a href="#mgcc">Modelo de múltiples servidores con tiempos de servicio arbitrarios y sin línea de espera</a></li>
+            <li><a href="#problemas-asignacion">Problemas de asignación de recursos</a></li>
+        </ul>
+
+        <section id="distribucion-cientificos">
+            <h3>Distribución de científicos entre grupos de investigación</h3>
+            <p>Calcula la asignación óptima de científicos a proyectos para maximizar el beneficio total.</p>
+        
+            <h4>Calculadora de asignación óptima</h4>
+            <form id="cientificos-form">
+                <label for="num-cientificos">Número de científicos disponibles (\(N\)):</label>
+                <input type="number" id="num-cientificos" min="1" required>
+                <br>
+                <label for="num-proyectos">Número de proyectos (\(M\)):</label>
+                <input type="number" id="num-proyectos" min="1" required>
+                <br>
+                <label for="beneficios">Matriz de beneficios (separada por comas, filas por saltos de línea):</label>
+                <textarea id="beneficios" rows="5" placeholder="Ejemplo:\n10,20,30\n5,15,25\n0,10,20"></textarea>
+                <br>
+                <button type="button" onclick="calcularDistribucion()">Calcular</button>
+            </form>
+        
+            <div id="resultado-cientificos" style="margin-top: 20px; display: none;">
+                <h4>Resultados:</h4>
+                <p><strong>Beneficio máximo:</strong> <span id="beneficio-maximo"></span></p>
+                <p><strong>Asignación óptima:</strong> <span id="asignacion"></span></p>
+            </div>
+        </section>        
     </main>
     <footer>
         <p>&copy; 2024 Investigación Operativa II</p>
     </footer>
+
+    <script>
+        function calcularDistribucion() {
+            const N = parseInt(document.getElementById("num-cientificos").value);
+            const M = parseInt(document.getElementById("num-proyectos").value);
+            const beneficiosTexto = document.getElementById("beneficios").value;
+        
+            if (isNaN(N) || isNaN(M) || N <= 0 || M <= 0 || !beneficiosTexto) {
+                alert("Por favor, ingresa valores válidos.");
+                return;
+            }
+        
+            // Parsear matriz de beneficios
+            const beneficios = beneficiosTexto
+                .trim()
+                .split("\n")
+                .map(row => row.split(",").map(Number));
+        
+            if (beneficios.length !== M || beneficios.some(row => row.length !== N + 1)) {
+                alert("La matriz de beneficios no tiene el formato correcto.");
+                return;
+            }
+        
+            // Programación dinámica
+            const dp = Array.from({ length: M + 1 }, () => Array(N + 1).fill(0));
+            const decisiones = Array.from({ length: M + 1 }, () => Array(N + 1).fill(0));
+        
+            for (let i = 1; i <= M; i++) {
+                for (let n = 0; n <= N; n++) {
+                    for (let j = 0; j <= n; j++) {
+                        const beneficio = beneficios[i - 1][j] + dp[i - 1][n - j];
+                        if (beneficio > dp[i][n]) {
+                            dp[i][n] = beneficio;
+                            decisiones[i][n] = j;
+                        }
+                    }
+                }
+            }
+        
+            // Reconstruir la solución
+            let asignacion = [];
+            let nRestante = N;
+            for (let i = M; i >= 1; i--) {
+                asignacion.unshift(decisiones[i][nRestante]);
+                nRestante -= decisiones[i][nRestante];
+            }
+        
+            // Mostrar resultados
+            document.getElementById("beneficio-maximo").textContent = dp[M][N];
+            document.getElementById("asignacion").textContent = asignacion.join(", ");
+            document.getElementById("resultado-cientificos").style.display = "block";
+        }
+    </script>
+        
 </body>
 </html>

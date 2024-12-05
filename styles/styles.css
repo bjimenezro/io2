@@ -152,3 +152,31 @@ form button:hover {
 #resultado-asignacion ul li {
     margin-bottom: 5px;
 }
+
+#resultado-mg1 {
+    background: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+#resultado-mg1 p {
+    margin: 5px 0;
+}
+
+#resultado-nacimiento-muerte {
+    background: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+#resultado-mgcc {
+    background: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 20px;
+}

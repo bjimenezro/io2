@@ -23,9 +23,10 @@
         <p>Explora los diferentes tipos de Programación Dinámica:</p>
         <ul>
             <li><a href="#distribucion-cientificos">Distribución de científicos entre grupos de investigación</a></li>
-            <li><a href="#wyndor-glass">Modelo de línea de espera con un servidor y tiempos de servicio arbitrarios</a></li>
-            <li><a href="#las-vegas">Modelo de múltiples servidores con tiempos de servicio arbitrarios y sin línea de espera</a></li>
-            <li><a href="#problemas-asignacion">Problemas de asignación de recursos</a></li>
+            <li><a href="#wyndor-glass">Problema de la Wyndor Glass Company</a></li>
+            <li><a href="#las-vegas">La Ganadora en Las Vegas</a></li>
+            <li><a href="#fuerza-trabajo">Modelo de Tamaño de la Fuerza de Trabajo</a></li>
+            <li><a href="#reemplazo-equipo">Modelo de Reemplazo de Equipo</a></li>
         </ul>
 
         <section id="distribucion-cientificos">
@@ -129,6 +130,31 @@
                 <p><strong>Asignación óptima:</strong> <span id="asignacion-optima"></span></p>
             </div>
         </section>
+
+        <section id="reemplazo-equipo">
+            <h3>Modelo de Reemplazo de Equipo</h3>
+            <p>Determina el momento óptimo para reemplazar el equipo minimizando los costos totales.</p>
+        
+            <h4>Calculadora</h4>
+            <form id="reemplazo-form">
+                <label for="vida-util">Vida útil máxima del equipo (años):</label>
+                <input type="number" id="vida-util" min="1" required>
+                <br>
+                <label for="costo-reemplazo">Costo de reemplazo (\( C_r \)):</label>
+                <input type="number" id="costo-reemplazo" min="1" required>
+                <br>
+                <label for="costos-mantenimiento">Costos de mantenimiento por año (separados por comas):</label>
+                <input type="text" id="costos-mantenimiento" required>
+                <br>
+                <button type="button" onclick="calcularReemplazo()">Calcular</button>
+            </form>
+        
+            <div id="resultado-reemplazo" style="margin-top: 20px; display: none;">
+                <h4>Resultados:</h4>
+                <p><strong>Costo mínimo total:</strong> <span id="costo-total-reemplazo"></span></p>
+                <p><strong>Decisiones óptimas:</strong> <span id="decisiones-reemplazo"></span></p>
+            </div>
+        </section>        
 
     </main>
     <footer>
@@ -300,6 +326,40 @@
             document.getElementById("costo-total").textContent = dp[0][0].toFixed(2);
             document.getElementById("asignacion-optima").textContent = asignacion.join(", ");
             document.getElementById("resultado-fuerza-trabajo").style.display = "block";
+        }
+
+        function calcularReemplazo() {
+            const T = parseInt(document.getElementById("vida-util").value);
+            const Cr = parseFloat(document.getElementById("costo-reemplazo").value);
+            const Cm = document.getElementById("costos-mantenimiento").value.split(",").map(Number);
+
+            if (Cm.length !== T || isNaN(Cr) || Cr <= 0 || Cm.some(c => isNaN(c) || c <= 0)) {
+                alert("Por favor, ingresa valores válidos.");
+                return;
+            }
+
+            // Arreglos para programación dinámica
+            const V = Array(T + 1).fill(0); // Costos mínimos acumulados
+            const decisiones = Array(T).fill(""); // Decisiones óptimas
+
+            // Programación dinámica (resolviendo hacia atrás)
+            for (let t = T - 1; t >= 0; t--) {
+                const continuar = Cm[t] + V[t + 1];
+                const reemplazar = Cr;
+
+                if (continuar < reemplazar) {
+                    V[t] = continuar;
+                    decisiones[t] = "Continuar";
+                } else {
+                    V[t] = reemplazar;
+                    decisiones[t] = "Reemplazar";
+                }
+            }
+
+            // Mostrar resultados
+            document.getElementById("costo-total-reemplazo").textContent = V[0].toFixed(2);
+            document.getElementById("decisiones-reemplazo").textContent = decisiones.join(", ");
+            document.getElementById("resultado-reemplazo").style.display = "block";
         }
     </script>
         

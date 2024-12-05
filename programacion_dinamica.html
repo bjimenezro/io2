@@ -24,7 +24,7 @@
         <ul>
             <li><a href="#distribucion-cientificos">Distribución de científicos entre grupos de investigación</a></li>
             <li><a href="#wyndor-glass">Modelo de línea de espera con un servidor y tiempos de servicio arbitrarios</a></li>
-            <li><a href="#mgcc">Modelo de múltiples servidores con tiempos de servicio arbitrarios y sin línea de espera</a></li>
+            <li><a href="#las-vegas">Modelo de múltiples servidores con tiempos de servicio arbitrarios y sin línea de espera</a></li>
             <li><a href="#problemas-asignacion">Problemas de asignación de recursos</a></li>
         </ul>
 
@@ -73,7 +73,31 @@
                 <p><strong>Ganancia total:</strong> <span id="ganancia-total"></span></p>
                 <p><strong>Restricciones cumplidas:</strong> <span id="restricciones-cumplidas"></span></p>
             </div>
-        </section>        
+        </section>
+
+        <section id="las-vegas">
+            <h3>La Ganadora en Las Vegas</h3>
+            <p>Calcula la probabilidad máxima de alcanzar una meta antes de quedarte sin dinero.</p>
+        
+            <h4>Calculadora probabilística</h4>
+            <form id="vegas-form">
+                <label for="cantidad-inicial">Cantidad inicial (\( S \)):</label>
+                <input type="number" id="cantidad-inicial" min="1" required>
+                <br>
+                <label for="meta">Meta (\( T \)):</label>
+                <input type="number" id="meta" min="1" required>
+                <br>
+                <label for="probabilidad">Probabilidad de ganar una apuesta (\( p \)):</label>
+                <input type="number" id="probabilidad" step="0.01" min="0" max="1" required>
+                <br>
+                <button type="button" onclick="calcularVegas()">Calcular</button>
+            </form>
+        
+            <div id="resultado-vegas" style="margin-top: 20px; display: none;">
+                <h4>Resultados:</h4>
+                <p><strong>Probabilidad máxima:</strong> <span id="probabilidad-maxima"></span></p>
+            </div>
+        </section>
 
     </main>
     <footer>
@@ -155,6 +179,40 @@
                 taller1 && taller2 && taller3 ? "Sí" : "No";
 
             document.getElementById("resultado-wyndor").style.display = "block";
+        }
+
+        function calcularVegas() {
+            const S = parseInt(document.getElementById("cantidad-inicial").value);
+            const T = parseInt(document.getElementById("meta").value);
+            const p = parseFloat(document.getElementById("probabilidad").value);
+
+            if (isNaN(S) || isNaN(T) || isNaN(p) || S <= 0 || T <= 0 || p < 0 || p > 1) {
+                alert("Por favor, ingresa valores válidos.");
+                return;
+            }
+
+            if (S >= T) {
+                alert("La cantidad inicial ya alcanza la meta.");
+                return;
+            }
+
+            // Inicialización del arreglo
+            const dp = Array(T + 1).fill(0);
+            dp[T] = 1; // Condición de frontera
+
+            // Resolver usando programación dinámica
+            for (let s = T - 1; s >= 0; s--) {
+                let maxProb = 0;
+                for (let x = 1; x <= s; x++) {
+                    const prob = p * dp[Math.min(s + x, T)] + (1 - p) * dp[Math.max(s - x, 0)];
+                    maxProb = Math.max(maxProb, prob);
+                }
+                dp[s] = maxProb;
+            }
+
+            // Mostrar resultados
+            document.getElementById("probabilidad-maxima").textContent = dp[S].toFixed(4);
+            document.getElementById("resultado-vegas").style.display = "block";
         }
     </script>
         

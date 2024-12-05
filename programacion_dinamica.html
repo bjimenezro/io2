@@ -99,6 +99,37 @@
             </div>
         </section>
 
+        <section id="fuerza-trabajo">
+            <h3>Modelo de Tamaño de la Fuerza de Trabajo</h3>
+            <p>Optimiza la asignación de trabajadores para minimizar los costos totales.</p>
+        
+            <h4>Calculadora</h4>
+            <form id="fuerza-trabajo-form">
+                <label for="periodos">Número de períodos:</label>
+                <input type="number" id="periodos" min="1" required>
+                <br>
+                <label for="demanda">Demanda de trabajadores por período (separados por comas):</label>
+                <input type="text" id="demanda" required>
+                <br>
+                <label for="costo-contratar">Costo por contratar (\( C_h \)):</label>
+                <input type="number" id="costo-contratar" min="0" required>
+                <br>
+                <label for="costo-despedir">Costo por despedir (\( C_f \)):</label>
+                <input type="number" id="costo-despedir" min="0" required>
+                <br>
+                <label for="costo-mantener">Costo por mantener (\( C_m \)):</label>
+                <input type="number" id="costo-mantener" min="0" required>
+                <br>
+                <button type="button" onclick="calcularFuerzaTrabajo()">Calcular</button>
+            </form>
+        
+            <div id="resultado-fuerza-trabajo" style="margin-top: 20px; display: none;">
+                <h4>Resultados:</h4>
+                <p><strong>Costo total mínimo:</strong> <span id="costo-total"></span></p>
+                <p><strong>Asignación óptima:</strong> <span id="asignacion-optima"></span></p>
+            </div>
+        </section>
+
     </main>
     <footer>
         <p>&copy; 2024 Investigación Operativa II</p>
@@ -213,6 +244,62 @@
             // Mostrar resultados
             document.getElementById("probabilidad-maxima").textContent = dp[S].toFixed(4);
             document.getElementById("resultado-vegas").style.display = "block";
+        }
+
+        function calcularFuerzaTrabajo() {
+            const periodos = parseInt(document.getElementById("periodos").value);
+            const demanda = document.getElementById("demanda").value.split(",").map(Number);
+            const costoContratar = parseFloat(document.getElementById("costo-contratar").value);
+            const costoDespedir = parseFloat(document.getElementById("costo-despedir").value);
+            const costoMantener = parseFloat(document.getElementById("costo-mantener").value);
+
+            if (demanda.length !== periodos || isNaN(costoContratar) || isNaN(costoDespedir) || isNaN(costoMantener)) {
+                alert("Por favor, ingresa valores válidos.");
+                return;
+            }
+
+            const dp = Array.from({ length: periodos + 1 }, () => []);
+            const decisiones = Array.from({ length: periodos }, () => []);
+
+            // Condición inicial
+            dp[periodos] = Array(101).fill(0).map((_, N) => N * costoMantener);
+
+            // Programación dinámica
+            for (let t = periodos - 1; t >= 0; t--) {
+                for (let Nt = 0; Nt <= 100; Nt++) {
+                    let minCosto = Infinity;
+                    let mejorNtp1 = 0;
+
+                    for (let Ntp1 = Math.max(demanda[t], 0); Ntp1 <= 100; Ntp1++) {
+                        const costo =
+                            Nt * costoMantener +
+                            (Ntp1 > Nt ? (Ntp1 - Nt) * costoContratar : (Nt - Ntp1) * costoDespedir) +
+                            dp[t + 1][Ntp1];
+
+                        if (costo < minCosto) {
+                            minCosto = costo;
+                            mejorNtp1 = Ntp1;
+                        }
+                    }
+
+                    dp[t][Nt] = minCosto;
+                    decisiones[t][Nt] = mejorNtp1;
+                }
+            }
+
+            // Reconstrucción del plan óptimo
+            const asignacion = [];
+            let actual = decisiones[0][0];
+
+            for (let t = 0; t < periodos; t++) {
+                asignacion.push(actual);
+                actual = decisiones[t][actual];
+            }
+
+            // Mostrar resultados
+            document.getElementById("costo-total").textContent = dp[0][0].toFixed(2);
+            document.getElementById("asignacion-optima").textContent = asignacion.join(", ");
+            document.getElementById("resultado-fuerza-trabajo").style.display = "block";
         }
     </script>
         
